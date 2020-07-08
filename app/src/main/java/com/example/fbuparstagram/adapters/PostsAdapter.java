@@ -94,6 +94,13 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             mTVUSN.setText(post.getUser().getUsername());
             mTVDate.setText(Post.getRelativeTimeAgo(post.getCreatedAt()));
             List<ParseFile> mediaFiles = post.getMedia();
+            List<String> likes = post.getLikes();
+            if(likes.size() == 0) {
+                mTVLikeCount.setVisibility(View.GONE);
+            } else {
+                mTVLikeCount.setVisibility(View.VISIBLE);
+                mTVLikeCount.setText("Liked by " + likes.size() + " others");
+            }
             if(mediaFiles.size() > 0) {
                 Glide.with(mContext).load(post.getMedia().get(0).getUrl()).into(mIVContent);
             }

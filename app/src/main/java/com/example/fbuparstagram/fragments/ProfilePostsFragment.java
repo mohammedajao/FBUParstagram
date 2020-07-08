@@ -11,9 +11,13 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.fbuparstagram.EndlessRecyclerViewScrollListener;
 import com.example.fbuparstagram.R;
 import com.example.fbuparstagram.adapters.PostsAdapter;
 import com.example.fbuparstagram.databinding.FragmentFeedBinding;
@@ -36,8 +40,11 @@ public class ProfilePostsFragment extends FeedFragment {
     public static final String TAG = ProfilePostsFragment.class.getSimpleName();
     public static final String ARG_ITEM_POSITION ="ITEM_POSITION";
 
+    private int mSkipAmount = 20;
     private int mItemPosition = 0;
     private FragmentProfilePostsBinding mBinding;
+
+    private MenuItem mMiActionProgress;
 
     public ProfilePostsFragment() {}
 
@@ -50,11 +57,31 @@ public class ProfilePostsFragment extends FeedFragment {
         }
     }
 
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        setHasOptionsMenu(true);
+        return super.onCreateView(inflater, container, savedInstanceState);
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        rvPosts.scrollToPosition(mItemPosition);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_main, menu);
+        mMiActionProgress = menu.findItem(R.id.miActionProgress);
+    }
+
     public void queryPosts() {
+        showProgressBar();
         ParseQuery<Post> query = ParseQuery.getQuery(Post.class);
         query.include(Post.KEY_USER);
         query.whereEqualTo(Post.KEY_USER, ParseUser.getCurrentUser());
-        query.setLimit(20);
+        query.setSkip(mSkipAmount * (mPage-1));
+        query.setLimit(mSkipAmount);
         query.addDescendingOrder(Post.KEY_CREATED_AT);
         query.findInBackground(new FindCallback<Post>() {
             @Override
@@ -63,13 +90,23 @@ public class ProfilePostsFragment extends FeedFragment {
                     Log.e(TAG, "Failed to get all posts", e);
                     return;
                 }
-                for(Post post : posts) {
-                    Log.i("POSTS:", post.getMedia().toString());
-                }
+                Log.i(TAG, ""+posts.size());
                 mAllPosts.addAll(posts);
                 mAdapter.notifyDataSetChanged();
-                rvPosts.scrollToPosition(mItemPosition);
+                hideProgressBar();
             }
         });
+    }
+
+    public void showProgressBar() {
+        if(mMiActionProgress != null)
+            mMiActionProgress.setVisible(true);
+        mProgressBar.setVisibility(View.VISIBLE);
+    }
+
+    public void hideProgressBar() {
+        if(mMiActionProgress != null)
+            mMiActionProgress.setVisible(false);
+        mProgressBar.setVisibility(View.GONE);
     }
 }

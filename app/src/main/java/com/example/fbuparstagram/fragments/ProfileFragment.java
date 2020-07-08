@@ -1,10 +1,8 @@
 package com.example.fbuparstagram.fragments;
 
 import android.content.Intent;
-import android.media.Image;
 import android.os.Bundle;
 
-import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -12,14 +10,17 @@ import androidx.fragment.app.FragmentManager;
 
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.example.fbuparstagram.R;
 import com.example.fbuparstagram.activities.LoginActivity;
 import com.example.fbuparstagram.adapters.ProfileGridViewAdapter;
@@ -48,6 +49,8 @@ public class ProfileFragment extends Fragment {
     private FragmentProfileBinding mBinding;
     private ParseUser mUser;
 
+    private MenuItem mMiActionProgress;
+
     private GridView mGVPosts;
 
     private TextView mUsername;
@@ -55,6 +58,8 @@ public class ProfileFragment extends Fragment {
 
     private Button mEditProfile;
     private Button mLogOut;
+
+    private ImageView mIVAvatar;
 
     private List<Post> mAllPosts;
     private ProfileGridViewAdapter mGVAdapter;
@@ -105,10 +110,18 @@ public class ProfileFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+        setHasOptionsMenu(true);
         mBinding = FragmentProfileBinding.inflate(inflater,container,false);
         View view = mBinding.getRoot();
         mAllPosts = new ArrayList<Post>();
         return view;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_main, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+        mMiActionProgress = menu.findItem(R.id.miActionProgress);
     }
 
     @Override
@@ -120,10 +133,12 @@ public class ProfileFragment extends Fragment {
         mDescription = mBinding.tvDescription;
         mEditProfile = mBinding.btnEditProfile;
         mLogOut = mBinding.btnLogOut;
+        mIVAvatar = mBinding.ivAvatar;
         // Set to user
         mUsername.setText(mUser.getUsername());
         // TODO Get description user set from Parse
         mDescription.setText("");
+
         onClickListener = new OnClickListener() {
             @Override
             public void onClick(int position) {
@@ -148,11 +163,14 @@ public class ProfileFragment extends Fragment {
                 getActivity().finish();
             }
         });
-
+        ParseUser user = ParseUser.getCurrentUser();
+        Glide.with(getContext()).load(user.get("avatar")).into(mIVAvatar);
         queryPosts();
     }
 
+
     public void queryPosts() {
+        showProgressBar();
         ParseQuery<Post> query = ParseQuery.getQuery(Post.class);
         query.include(Post.KEY_USER);
         query.whereEqualTo(Post.KEY_USER, ParseUser.getCurrentUser());
@@ -165,12 +183,22 @@ public class ProfileFragment extends Fragment {
                     Log.e(TAG, "Failed to get all posts", e);
                     return;
                 }
-                for(Post post : posts) {
-                    Log.i("POSTS:", post.getMedia().toString());
-                }
                 mAllPosts.addAll(posts);
                 mGVAdapter.notifyDataSetChanged();
+                hideProgressBar();
             }
         });
+    }
+
+    public void showProgressBar() {
+        if(mMiActionProgress != null)
+            mMiActionProgress.setVisible(true);
+        mBinding.pbLoading.setVisibility(View.VISIBLE);
+    }
+
+    public void hideProgressBar() {
+        if(mMiActionProgress != null)
+            mMiActionProgress.setVisible(false);
+        mBinding.pbLoading.setVisibility(View.GONE);
     }
 }

@@ -11,9 +11,15 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 
+import com.example.fbuparstagram.EndlessRecyclerViewScrollListener;
+import com.example.fbuparstagram.activities.MainActivity;
 import com.example.fbuparstagram.adapters.PostsAdapter;
 import com.example.fbuparstagram.R;
 import com.example.fbuparstagram.databinding.FragmentFeedBinding;
@@ -47,6 +53,13 @@ public class FeedFragment extends Fragment {
     protected RecyclerView rvPosts;
     protected PostsAdapter mAdapter;
     protected List<Post> mAllPosts;
+    protected EndlessRecyclerViewScrollListener mEndlessScrollListener;
+
+    private MenuItem mMiActionProgress;
+    protected ProgressBar mProgressBar;
+
+    private int mSkipAmount = 20;
+    protected int mPage = 1;
 
     public FeedFragment() {
         // Required empty public constructor
@@ -83,13 +96,21 @@ public class FeedFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        Log.i(TAG, "Creating rvPosts");
         mAllPosts = new ArrayList<>();
         mAdapter = new PostsAdapter(getContext(), mAllPosts);
+        mProgressBar = mBinding.pbLoading;
         rvPosts = view.findViewById(R.id.rvPosts);
         rvPosts.setAdapter(mAdapter);
-        rvPosts.setLayoutManager(new LinearLayoutManager(getContext()));
-        Log.i(TAG, "Set adapter and recyclerview");
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
+        rvPosts.setLayoutManager(linearLayoutManager);
+        mEndlessScrollListener = new EndlessRecyclerViewScrollListener(linearLayoutManager) {
+            @Override
+            public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
+                // Triggered only when new data needs to be appended to the list
+                // Add whatever code is needed to append new items to the bottom of the list
+                loadNextDataFromApi(page);
+            }
+        };
         mSwipeContainer = mBinding.swipeContainer;
         mSwipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -101,9 +122,8 @@ public class FeedFragment extends Fragment {
     }
 
     private void fetchTimelineAsync(int page) {
-        // Clear adapter
+        mPage = page;
         mAdapter.clear();
-        // Add all data and new items to adapter
         queryPosts();
         mSwipeContainer.setRefreshing(false);
     }
@@ -112,15 +132,25 @@ public class FeedFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+        setHasOptionsMenu(true);
         mBinding = FragmentFeedBinding.inflate(inflater,container,false);
         View view = mBinding.getRoot();
         return view;
     }
 
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_main, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+        mMiActionProgress = menu.findItem(R.id.miActionProgress);
+    }
+
     public void queryPosts() {
+        showProgressBar();
         ParseQuery<Post> query = ParseQuery.getQuery(Post.class);
         query.include(Post.KEY_USER);
-        query.setLimit(20);
+        query.setSkip(mSkipAmount * (mPage - 1));
+        query.setLimit(mSkipAmount);
         query.addDescendingOrder(Post.KEY_CREATED_AT);
         query.findInBackground(new FindCallback<Post>() {
             @Override
@@ -134,7 +164,32 @@ public class FeedFragment extends Fragment {
                 }
                 mAllPosts.addAll(posts);
                 mAdapter.notifyDataSetChanged();
+                hideProgressBar();
             }
         });
+    }
+
+    public void loadNextDataFromApi(int offset) {
+        mPage = offset;
+        Log.i(TAG, ""+offset);
+        queryPosts();
+        // Send an API request to retrieve appropriate paginated data
+        //  --> Send the request including an offset value (i.e `page`) as a query parameter.
+        //  --> Deserialize and construct new model objects from the API response
+        //  --> Append the new data objects to the existing set of items inside the array of items
+        //  --> Notify the adapter of the new items made with `notifyItemRangeInserted()`
+    }
+
+
+    public void showProgressBar() {
+        if(mMiActionProgress != null)
+            mMiActionProgress.setVisible(true);
+        mProgressBar.setVisibility(View.VISIBLE);
+    }
+
+    public void hideProgressBar() {
+        if(mMiActionProgress != null)
+            mMiActionProgress.setVisible(false);
+        mProgressBar.setVisibility(View.GONE);
     }
 }

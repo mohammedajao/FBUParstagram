@@ -43,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
     private File mPhotoFile;
 
     private MenuItem mMiChat;
+    private MenuItem mMiProgressItem;
     private BottomNavigationView mButtonNavigationView;
 
     @Override
@@ -94,20 +95,6 @@ public class MainActivity extends AppCompatActivity {
         fragmentManager.beginTransaction().replace(R.id.fragmentContainer, new FeedFragment()).commit();
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        mMiChat = menu.findItem(R.id.miChat);
-
-        mMiChat.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem menuItem) {
-                // TODO Go to chat fragment
-                return true;
-            }
-        });
-        return true;
-    }
 
     private void launchCamera() {
         Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
@@ -158,4 +145,5 @@ public class MainActivity extends AppCompatActivity {
 
         }
     }
+
 }
