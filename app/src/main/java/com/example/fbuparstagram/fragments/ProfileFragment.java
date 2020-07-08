@@ -23,11 +23,13 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.example.fbuparstagram.R;
 import com.example.fbuparstagram.activities.LoginActivity;
+import com.example.fbuparstagram.activities.ProfileEditActivity;
 import com.example.fbuparstagram.adapters.ProfileGridViewAdapter;
 import com.example.fbuparstagram.databinding.FragmentProfileBinding;
 import com.example.fbuparstagram.models.Post;
 import com.parse.FindCallback;
 import com.parse.ParseException;
+import com.parse.ParseFile;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
@@ -101,6 +103,28 @@ public class ProfileFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
+            String username = getArguments().getString("USER_TARGET");
+//            if(username == ParseUser.getCurrentUser().getUsername()) {
+//                mUser = ParseUser.getCurrentUser();
+//                return;
+//            }
+            ParseQuery<ParseUser> query = ParseQuery.getQuery(ParseUser.class);
+            query.whereEqualTo("username", username);
+            try {
+                mUser = query.getFirst();
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+//            query.findInBackground(new FindCallback<ParseUser>() {
+//                @Override
+//                public void done(List<ParseUser> returnedUser, ParseException e) {
+//                    if(e != null) {
+//                        Log.e(TAG, "Failed to find user", e);
+//                    } else {
+//                        mUser = returnedUser.get(0);
+//                    }
+//                }
+//            });
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
@@ -127,7 +151,6 @@ public class ProfileFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        mUser = ParseUser.getCurrentUser();
         mGVPosts = mBinding.gvPosts;
         mUsername = mBinding.tvName;
         mDescription = mBinding.tvDescription;
@@ -136,8 +159,10 @@ public class ProfileFragment extends Fragment {
         mIVAvatar = mBinding.ivAvatar;
         // Set to user
         mUsername.setText(mUser.getUsername());
-        // TODO Get description user set from Parse
-        mDescription.setText("");
+        mDescription.setText(mUser.getString("bio"));
+
+        if(mUser.equals(ParseUser.getCurrentUser()))
+            mLogOut.setVisibility(View.GONE);
 
         onClickListener = new OnClickListener() {
             @Override
@@ -146,10 +171,19 @@ public class ProfileFragment extends Fragment {
                 Fragment frag = new ProfilePostsFragment();
                 Bundle bundle = new Bundle();
                 bundle.putInt("ITEM_POSITION", position);
+                bundle.putString("USER_TARGET", getArguments().getString("USER_TARGET"));
                 frag.setArguments(bundle);
                 manager.beginTransaction().replace(R.id.fragmentContainer, frag).commit();
             }
         };
+
+        mEditProfile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getActivity(), ProfileEditActivity.class);
+                startActivity(intent);
+            }
+        });
 
         mGVAdapter = new ProfileGridViewAdapter(getContext(), mAllPosts,mGVPosts,onClickListener);
         mGVPosts.setAdapter(mGVAdapter);
@@ -163,8 +197,9 @@ public class ProfileFragment extends Fragment {
                 getActivity().finish();
             }
         });
-        ParseUser user = ParseUser.getCurrentUser();
-        Glide.with(getContext()).load(user.get("avatar")).into(mIVAvatar);
+        ParseFile userAvatar = mUser.getParseFile("avatar");
+        if(userAvatar != null)
+            Glide.with(getContext()).load(userAvatar.getUrl()).into(mIVAvatar);
         queryPosts();
     }
 
@@ -173,7 +208,7 @@ public class ProfileFragment extends Fragment {
         showProgressBar();
         ParseQuery<Post> query = ParseQuery.getQuery(Post.class);
         query.include(Post.KEY_USER);
-        query.whereEqualTo(Post.KEY_USER, ParseUser.getCurrentUser());
+        query.whereEqualTo(Post.KEY_USER, mUser);
         query.setLimit(20);
         query.addDescendingOrder(Post.KEY_CREATED_AT);
         query.findInBackground(new FindCallback<Post>() {
@@ -183,6 +218,7 @@ public class ProfileFragment extends Fragment {
                     Log.e(TAG, "Failed to get all posts", e);
                     return;
                 }
+                Log.i(TAG, ""+posts.size());
                 mAllPosts.addAll(posts);
                 mGVAdapter.notifyDataSetChanged();
                 hideProgressBar();

@@ -1,6 +1,7 @@
 package com.example.fbuparstagram.adapters;
 
 import android.content.Context;
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,10 +9,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.fbuparstagram.R;
+import com.example.fbuparstagram.fragments.ProfileFragment;
 import com.example.fbuparstagram.models.Post;
 import com.parse.ParseFile;
 
@@ -20,10 +23,12 @@ import java.util.List;
 public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> {
     private Context mContext;
     private List<Post> mPosts;
+    private FragmentManager mFragmentManager;
 
-    public PostsAdapter(Context context, List<Post> posts) {
+    public PostsAdapter(Context context, List<Post> posts, FragmentManager fragmentManager) {
         this.mContext = context;
         this.mPosts = posts;
+        this.mFragmentManager = fragmentManager;
     }
 
     @NonNull
@@ -88,7 +93,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             mIVBookmark = view.findViewById(R.id.ivBookmark);
         }
 
-        public void bind(Post post) {
+        public void bind(final Post post) {
             mTVCaption.setText(post.getBody());
             mTVUsername.setText(post.getUser().getUsername());
             mTVUSN.setText(post.getUser().getUsername());
@@ -104,6 +109,21 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             if(mediaFiles.size() > 0) {
                 Glide.with(mContext).load(post.getMedia().get(0).getUrl()).into(mIVContent);
             }
+
+            ParseFile file = post.getUser().getParseFile("avatar");
+            if(file != null)
+                Glide.with(mContext).load(file.getUrl()).into(mIVAvatar);
+
+            mIVAvatar.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    ProfileFragment profileFrag = new ProfileFragment();
+                    Bundle bundle = new Bundle();
+                    bundle.putString("USER_TARGET", post.getUser().getUsername());
+                    profileFrag.setArguments(bundle);
+                    mFragmentManager.beginTransaction().replace(R.id.fragmentContainer, profileFrag).commit();
+                }
+            });
         }
     }
 }

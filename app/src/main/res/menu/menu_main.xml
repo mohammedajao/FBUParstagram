@@ -13,4 +13,11 @@
         android:orderInCategory="100"
         app:showAsAction="always"
         app:actionLayout="@layout/action_view_progress" />
+    <item
+        android:id="@+id/miEditProfileDone"
+        android:title="Done"
+        android:visible="false"
+        android:orderInCategory="90"
+        app:showAsAction="always"
+        />
 </menu>

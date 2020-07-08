@@ -45,6 +45,7 @@ public class ProfilePostsFragment extends FeedFragment {
     private FragmentProfilePostsBinding mBinding;
 
     private MenuItem mMiActionProgress;
+    private ParseUser mUser;
 
     public ProfilePostsFragment() {}
 
@@ -53,6 +54,16 @@ public class ProfilePostsFragment extends FeedFragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             mItemPosition = getArguments().getInt(ARG_ITEM_POSITION);
+            String userToQuery = getArguments().getString("USER_TARGET");
+            ParseQuery<ParseUser> query = ParseQuery.getQuery(ParseUser.class);
+            query.whereEqualTo("username", userToQuery);
+            try {
+                mUser = query.getFirst();
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            if(mUser == null)
+                mUser = ParseUser.getCurrentUser();
             Log.i(TAG, mItemPosition + "");
         }
     }
@@ -79,7 +90,7 @@ public class ProfilePostsFragment extends FeedFragment {
         showProgressBar();
         ParseQuery<Post> query = ParseQuery.getQuery(Post.class);
         query.include(Post.KEY_USER);
-        query.whereEqualTo(Post.KEY_USER, ParseUser.getCurrentUser());
+        query.whereEqualTo(Post.KEY_USER, mUser);
         query.setSkip(mSkipAmount * (mPage-1));
         query.setLimit(mSkipAmount);
         query.addDescendingOrder(Post.KEY_CREATED_AT);

@@ -97,7 +97,7 @@ public class FeedFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         mAllPosts = new ArrayList<>();
-        mAdapter = new PostsAdapter(getContext(), mAllPosts);
+        mAdapter = new PostsAdapter(getContext(), mAllPosts, getFragmentManager());
         mProgressBar = mBinding.pbLoading;
         rvPosts = view.findViewById(R.id.rvPosts);
         rvPosts.setAdapter(mAdapter);

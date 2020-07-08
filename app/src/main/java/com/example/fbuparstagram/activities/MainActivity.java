@@ -29,6 +29,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
+import com.parse.ParseUser;
 
 import java.io.File;
 import java.util.List;
@@ -42,8 +43,6 @@ public class MainActivity extends AppCompatActivity {
     public String mPhotoFileName;
     private File mPhotoFile;
 
-    private MenuItem mMiChat;
-    private MenuItem mMiProgressItem;
     private BottomNavigationView mButtonNavigationView;
 
     @Override
@@ -82,6 +81,9 @@ public class MainActivity extends AppCompatActivity {
                         break;
                     case R.id.miProfile:
                         fragment = new ProfileFragment();
+                        Bundle bundle = new Bundle();
+                        bundle.putString("USER_TARGET", ParseUser.getCurrentUser().getUsername());
+                        fragment.setArguments(bundle);
                         break;
                     default:
                         fragment = new FeedFragment();

@@ -109,6 +109,7 @@ public class ComposeFragment extends Fragment {
             public void onClick(View view) {
                 String description = binding.etCaption.getText().toString();
                 Log.i(TAG, "Checking to see if post can be saved.");
+                mETCaption.clearFocus();
                 if(description.isEmpty()) {
                     Toast.makeText(getContext(), "Description cannot be empty!", Toast.LENGTH_SHORT);
                     return;
@@ -156,6 +157,7 @@ public class ComposeFragment extends Fragment {
                 mIVPreview.setImageResource(0);
             }
         });
+
     }
 
     @Override

@@ -44,7 +44,7 @@ public class ProfileGridViewAdapter extends BaseAdapter {
 
     @Override
     public long getItemId(int i) {
-        return Long.parseLong(mPosts.get(i).getObjectId(), 16);
+        return 0;
     }
 
     @Override
