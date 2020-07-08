@@ -7,13 +7,14 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.fbuparstagram.PostsAdapter;
+import com.example.fbuparstagram.adapters.PostsAdapter;
 import com.example.fbuparstagram.R;
 import com.example.fbuparstagram.databinding.FragmentFeedBinding;
 import com.example.fbuparstagram.models.Post;
@@ -42,9 +43,10 @@ public class FeedFragment extends Fragment {
     private String mParam2;
 
     private FragmentFeedBinding mBinding;
-    private RecyclerView rvPosts;
-    private PostsAdapter adapter;
-    private List<Post> allPosts;
+    private SwipeRefreshLayout mSwipeContainer;
+    protected RecyclerView rvPosts;
+    protected PostsAdapter mAdapter;
+    protected List<Post> mAllPosts;
 
     public FeedFragment() {
         // Required empty public constructor
@@ -81,12 +83,29 @@ public class FeedFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        allPosts = new ArrayList<>();
-        adapter = new PostsAdapter(getContext(), allPosts);
+        Log.i(TAG, "Creating rvPosts");
+        mAllPosts = new ArrayList<>();
+        mAdapter = new PostsAdapter(getContext(), mAllPosts);
         rvPosts = view.findViewById(R.id.rvPosts);
-        rvPosts.setAdapter(adapter);
+        rvPosts.setAdapter(mAdapter);
         rvPosts.setLayoutManager(new LinearLayoutManager(getContext()));
+        Log.i(TAG, "Set adapter and recyclerview");
+        mSwipeContainer = mBinding.swipeContainer;
+        mSwipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                fetchTimelineAsync(0);
+            }
+        });
         queryPosts();
+    }
+
+    private void fetchTimelineAsync(int page) {
+        // Clear adapter
+        mAdapter.clear();
+        // Add all data and new items to adapter
+        queryPosts();
+        mSwipeContainer.setRefreshing(false);
     }
 
     @Override
@@ -101,6 +120,8 @@ public class FeedFragment extends Fragment {
     public void queryPosts() {
         ParseQuery<Post> query = ParseQuery.getQuery(Post.class);
         query.include(Post.KEY_USER);
+        query.setLimit(20);
+        query.addDescendingOrder(Post.KEY_CREATED_AT);
         query.findInBackground(new FindCallback<Post>() {
             @Override
             public void done(List<Post> posts, ParseException e) {
@@ -111,8 +132,8 @@ public class FeedFragment extends Fragment {
                 for(Post post : posts) {
                     Log.i("POSTS:", post.getMedia().toString());
                 }
-                allPosts.addAll(posts);
-                adapter.notifyDataSetChanged();
+                mAllPosts.addAll(posts);
+                mAdapter.notifyDataSetChanged();
             }
         });
     }

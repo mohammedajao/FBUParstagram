@@ -3,19 +3,21 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/clIcon"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/tvUsername"
+        android:layout_below="@+id/ivAvatarCard"
         android:layout_marginTop="0dp">
 
         <ImageView
             android:id="@+id/ivContent"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
+            android:layout_height="300dp"
+            android:layout_marginBottom="10dp"
+            android:scaleType="centerCrop"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintDimensionRatio="H,1:1"
             app:layout_constraintEnd_toEndOf="parent"
@@ -31,10 +33,11 @@
         android:layout_below="@+id/ivLike"
         android:layout_alignParentStart="true"
         android:layout_alignParentEnd="true"
-        android:layout_marginStart="5dp"
-        android:layout_marginTop="0dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="5dp"
         android:layout_marginEnd="0dp"
         android:text="Liked by 6000 others"
+        android:textSize="12sp"
         android:textStyle="bold" />
 
     <TextView
@@ -43,46 +46,58 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/tvLikeCount"
         android:layout_alignParentStart="true"
-        android:layout_marginStart="0dp"
+        android:layout_marginStart="10dp"
         android:layout_marginTop="0dp"
         android:gravity="center_vertical"
-        android:paddingStart="5dp"
         android:text="username"
-        android:textSize="18sp"
+        android:textAllCaps="false"
+        android:textSize="12sp"
         android:textStyle="bold" />
 
-    <ImageView
-        android:id="@+id/ivAvatar"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
+    <androidx.cardview.widget.CardView
+        android:id="@+id/ivAvatarCard"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
-        android:layout_marginStart="0dp"
-        android:layout_marginTop="0dp"
-        android:padding="5dp"
-        tools:srcCompat="@tools:sample/avatars" />
+        android:layout_gravity="center"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:padding="10dp"
+        app:cardCornerRadius="50dp">
+
+        <ImageView
+            android:id="@+id/ivAvatar"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:srcCompat="@tools:sample/avatars" />
+    </androidx.cardview.widget.CardView>
 
     <TextView
         android:id="@+id/tvUsername"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/ivAvatar"
+        android:layout_above="@+id/clIcon"
         android:layout_alignParentTop="true"
-        android:layout_marginStart="5dp"
-        android:layout_marginLeft="5dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginLeft="10dp"
         android:layout_marginTop="0dp"
         android:layout_marginEnd="0dp"
         android:layout_marginBottom="0dp"
         android:layout_toStartOf="@+id/ivMore"
-        android:layout_toEndOf="@+id/ivAvatar"
+        android:layout_toEndOf="@+id/ivAvatarCard"
+        android:ellipsize="end"
         android:gravity="center_vertical"
+        android:lines="1"
+        android:singleLine="true"
         android:text="username"
-        android:textSize="18sp"
+        android:textSize="14sp"
         android:textStyle="bold" />
 
     <ImageView
         android:id="@+id/ivMore"
-        android:layout_width="wrap_content"
+        android:layout_width="30dp"
         android:layout_height="30dp"
         android:layout_above="@+id/clIcon"
         android:layout_alignParentTop="true"
@@ -90,7 +105,7 @@
         android:layout_marginTop="10dp"
         android:layout_marginEnd="10dp"
         android:layout_marginBottom="10dp"
-        app:srcCompat="@drawable/ufi_more" />
+        app:srcCompat="@drawable/ic_baseline_more_horiz_24" />
 
     <ImageView
         android:id="@+id/ivLike"
@@ -98,7 +113,7 @@
         android:layout_height="30dp"
         android:layout_below="@+id/clIcon"
         android:layout_alignParentStart="true"
-        android:layout_marginStart="5dp"
+        android:layout_marginStart="10dp"
         android:layout_marginTop="0dp"
         android:layout_marginEnd="5dp"
         android:layout_marginBottom="5dp"
@@ -117,10 +132,11 @@
 
     <ImageView
         android:id="@+id/ivDirect"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
         android:layout_below="@+id/clIcon"
-        android:layout_marginTop="0dp"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="-3dp"
         android:layout_toEndOf="@+id/ivComment"
         app:srcCompat="@drawable/ufi_new_direct" />
 
@@ -143,11 +159,12 @@
         android:layout_below="@+id/tvCaption"
         android:layout_alignParentStart="true"
         android:layout_alignParentEnd="true"
-        android:layout_marginStart="5dp"
-        android:layout_marginLeft="5dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginLeft="10dp"
         android:layout_marginTop="0dp"
         android:layout_marginEnd="0dp"
-        android:text="View all comments" />
+        android:text="View all comments"
+        android:textSize="12sp" />
 
     <TextView
         android:id="@+id/tvCaption"
@@ -163,7 +180,8 @@
         android:layout_toEndOf="@+id/tvUSN"
         android:layout_weight="1"
         android:gravity="center_vertical"
-        android:text="content description" />
+        android:text="content description"
+        android:textSize="12sp" />
 
     <TextView
         android:id="@+id/tvDate"
@@ -171,8 +189,10 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/tvCommentBtn"
         android:layout_alignParentStart="true"
-        android:layout_marginStart="5dp"
+        android:layout_marginStart="10dp"
         android:layout_marginTop="0dp"
-        android:text="22 hours ago" />
+        android:layout_marginBottom="10dp"
+        android:text="22 hours ago"
+        android:textSize="12sp" />
 
 </RelativeLayout>

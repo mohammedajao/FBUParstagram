@@ -1,4 +1,4 @@
-package com.example.fbuparstagram;
+package com.example.fbuparstagram.adapters;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.example.fbuparstagram.R;
 import com.example.fbuparstagram.models.Post;
 import com.parse.ParseFile;
 
@@ -41,6 +42,16 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
     @Override
     public int getItemCount() {
         return mPosts.size();
+    }
+
+    public void addAll(List<Post> list) {
+        mPosts.addAll(list);
+        notifyDataSetChanged();
+    }
+
+    public void clear() {
+        mPosts.clear();
+        notifyDataSetChanged();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
@@ -81,9 +92,11 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             mTVCaption.setText(post.getBody());
             mTVUsername.setText(post.getUser().getUsername());
             mTVUSN.setText(post.getUser().getUsername());
+            mTVDate.setText(Post.getRelativeTimeAgo(post.getCreatedAt()));
             List<ParseFile> mediaFiles = post.getMedia();
-            if(mediaFiles.size() > 0)
+            if(mediaFiles.size() > 0) {
                 Glide.with(mContext).load(post.getMedia().get(0).getUrl()).into(mIVContent);
+            }
         }
     }
 }

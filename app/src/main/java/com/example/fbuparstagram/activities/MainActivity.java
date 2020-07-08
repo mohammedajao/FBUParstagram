@@ -23,6 +23,7 @@ import com.example.fbuparstagram.databinding.ActivityFeedBinding;
 import com.example.fbuparstagram.databinding.ToolbarBinding;
 import com.example.fbuparstagram.fragments.ComposeFragment;
 import com.example.fbuparstagram.fragments.FeedFragment;
+import com.example.fbuparstagram.fragments.ProfileFragment;
 import com.example.fbuparstagram.models.Post;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.parse.FindCallback;
@@ -75,10 +76,11 @@ public class MainActivity extends AppCompatActivity {
                 Fragment fragment = null;
                 switch(menuItem.getItemId()) {
                     case R.id.miCompose:
+                        fragment = new FeedFragment();
                         launchCamera();
                         break;
                     case R.id.miProfile:
-                        fragment = new FeedFragment();
+                        fragment = new ProfileFragment();
                         break;
                     default:
                         fragment = new FeedFragment();

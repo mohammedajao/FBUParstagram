@@ -141,6 +141,9 @@ public class ComposeFragment extends Fragment {
         post.setBody(description);
         post.setMedia(media);
         post.setUser(currentUser);
+        post.setLikesCount(0);
+        post.setLikes(new ArrayList<String>());
+        post.setComments(new ArrayList<String>());
 
         post.saveInBackground(new SaveCallback() {
             @Override
