@@ -20,6 +20,7 @@ import com.example.fbuparstagram.Queryer;
 import com.example.fbuparstagram.R;
 import com.example.fbuparstagram.activities.PostViewActivity;
 import com.example.fbuparstagram.fragments.ProfileFragment;
+import com.example.fbuparstagram.helpers.Util;
 import com.example.fbuparstagram.models.Post;
 import com.example.fbuparstagram.models.User;
 import com.parse.ParseException;
@@ -127,7 +128,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             mTVCaption.setText(post.getBody());
             mTVUsername.setText(post.getUser().getUsername());
             mTVUSN.setText(post.getUser().getUsername());
-            mTVDate.setText(Post.getRelativeTimeAgo(post.getCreatedAt()));
+            mTVDate.setText(Util.getRelativeTimeAgo(post.getCreatedAt()));
             List<ParseFile> mediaFiles = post.getMedia();
             if(likes.size() == 0) {
                 mTVLikeCount.setVisibility(View.GONE);

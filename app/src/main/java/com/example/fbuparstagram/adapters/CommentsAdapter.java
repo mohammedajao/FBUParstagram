@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.fbuparstagram.Queryer;
 import com.example.fbuparstagram.R;
+import com.example.fbuparstagram.helpers.Util;
 import com.example.fbuparstagram.models.Comment;
 import com.example.fbuparstagram.models.Post;
 import com.example.fbuparstagram.models.User;
@@ -75,7 +76,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
                 Glide.with(mContext).load(file.getUrl()).into(mIVAvatar);
             mTVUsername.setText(cmtUser.getUsername());
             mTVBody.setText(comment.getBody());
-            mTVDate.setText(Comment.getRelativeTimeAgo(comment.getCreatedAt()));
+            mTVDate.setText(Util.getRelativeTimeAgo(comment.getCreatedAt()));
         }
     }
 }

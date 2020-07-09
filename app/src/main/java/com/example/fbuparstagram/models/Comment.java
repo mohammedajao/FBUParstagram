@@ -30,21 +30,4 @@ public class Comment extends ParseObject {
 
     public ParseObject getPost() { return getParseObject(KEY_POST); }
     public void setPost(Post post) { put(KEY_POST, post); }
-
-    public static String getRelativeTimeAgo(Date createdAt) {
-        String twitterFormat = "EEE MMM dd HH:mm:ss ZZZZZ yyyy";
-        SimpleDateFormat sf = new SimpleDateFormat(twitterFormat, Locale.ENGLISH);
-        sf.setLenient(true);
-
-        String relativeDate = "";
-        try {
-            long dateMillis = sf.parse(createdAt.toString()).getTime();
-            relativeDate = DateUtils.getRelativeTimeSpanString(dateMillis,
-                    System.currentTimeMillis(), DateUtils.SECOND_IN_MILLIS).toString();
-        } catch (java.text.ParseException e) {
-            e.printStackTrace();
-        }
-
-        return relativeDate;
-    }
 }

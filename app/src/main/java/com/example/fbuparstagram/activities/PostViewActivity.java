@@ -20,12 +20,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.example.fbuparstagram.EndlessRecyclerViewScrollListener;
 import com.example.fbuparstagram.Queryer;
 import com.example.fbuparstagram.R;
 import com.example.fbuparstagram.adapters.CommentsAdapter;
 import com.example.fbuparstagram.databinding.ActivityPostViewBinding;
 import com.example.fbuparstagram.databinding.ToolbarBinding;
 import com.example.fbuparstagram.fragments.ProfileFragment;
+import com.example.fbuparstagram.helpers.Util;
 import com.example.fbuparstagram.models.Comment;
 import com.example.fbuparstagram.models.Post;
 import com.example.fbuparstagram.models.User;
@@ -47,6 +49,8 @@ public class PostViewActivity extends AppCompatActivity {
 
     private ActivityPostViewBinding mBinding;
     private MenuItem mMiDone;
+
+    private EndlessRecyclerViewScrollListener mEndlessScrollListener;
 
     private RecyclerView mRvComments;
     private CommentsAdapter mCmtsAdapter;
@@ -127,48 +131,7 @@ public class PostViewActivity extends AppCompatActivity {
         }
         mCmtsAdapter = new CommentsAdapter(this,mPostComments);
 
-        Queryer.getInstance().queryCommentsByPostId(new Queryer.QueryCallback() {
-            @Override
-            public void done(List data) {
-                Log.i(TAG, "Got a list of comments: " + data.toString() + data.size());
-                mPostComments.addAll(data);
-                mCmtsAdapter.notifyDataSetChanged();
-            }
-
-            @Override
-            public void done(ParseUser user) {
-
-            }
-
-            @Override
-            public void done(Post post) {
-
-            }
-
-            @Override
-            public void done(Comment cmt) {
-
-            }
-        }, mPost.getObjectId());
-
-//        ParseRelation postCommentRelation = mPost.getRelation(Post.KEY_COMMENTS);
-//        ParseQuery postCommentQuery = postCommentRelation.getQuery();
-//        postCommentQuery.include(Comment.KEY_AUTHOR);
-//        postCommentQuery.include(Comment.KEY_AUTHOR + "." + User.KEY_USN);
-//        postCommentQuery.include(Comment.KEY_AUTHOR + "." + User.KEY_AVATAR);
-//        postCommentQuery.findInBackground(new FindCallback() {
-//            @Override
-//            public void done(List objects, ParseException e) {
-//                Log.i(TAG, "Got a list of comments: " + objects.toString() + objects.size());
-//                mPostComments.addAll(objects);
-//                mCmtsAdapter.notifyDataSetChanged();
-//            }
-//
-//            @Override
-//            public void done(Object o, Throwable throwable) {
-//
-//            }
-//        });
+        loadNextDataFromApi(0);
 
         mRvComments = mBinding.rvComments;
         mProgressBar = mBinding.pbLoading;
@@ -187,8 +150,20 @@ public class PostViewActivity extends AppCompatActivity {
         mPostBody = mBinding.etPostBody;
         mPostBtn = mBinding.tvPostBtn;
 
-        mRvComments.setLayoutManager(new LinearLayoutManager(this));
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        mRvComments.setLayoutManager(linearLayoutManager);
         mRvComments.setAdapter(mCmtsAdapter);
+
+        mEndlessScrollListener = new EndlessRecyclerViewScrollListener(linearLayoutManager) {
+            @Override
+            public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
+                // Triggered only when new data needs to be appended to the list
+                // Add whatever code is needed to append new items to the bottom of the list
+                loadNextDataFromApi(page);
+            }
+        };
+        // Adds the scroll listener to RecyclerView
+        mRvComments.addOnScrollListener(mEndlessScrollListener);
 
         showProgressBar();
 
@@ -214,7 +189,7 @@ public class PostViewActivity extends AppCompatActivity {
     private void bindContent() {
         mTVUsername.setText(mPost.getUser().getUsername());
         mTVCaption.setText(mPost.getBody());
-        mTVDate.setText(Post.getRelativeTimeAgo(mPost.getCreatedAt()));
+        mTVDate.setText(Util.getRelativeTimeAgo(mPost.getCreatedAt()));
         mTVUSN.setText(mPost.getUser().getUsername());
 
         List<ParseFile> mediaFiles = mPost.getMedia();
@@ -319,6 +294,33 @@ public class PostViewActivity extends AppCompatActivity {
             }
         });
         hideProgressBar();
+    }
+
+    private void loadNextDataFromApi(int page) {
+        mQueryer.setPage(page);
+        mQueryer.queryCommentsByPostId(new Queryer.QueryCallback() {
+            @Override
+            public void done(List data) {
+                mPostComments.addAll(data);
+                mCmtsAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void done(ParseUser user) {
+
+            }
+
+            @Override
+            public void done(Post post) {
+
+            }
+
+            @Override
+            public void done(Comment cmt) {
+
+            }
+        }, mPost.getObjectId());
+        mQueryer.setPage(0);
     }
 
     private void showProgressBar() {
