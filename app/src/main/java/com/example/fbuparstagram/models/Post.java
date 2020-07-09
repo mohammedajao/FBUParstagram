@@ -39,7 +39,7 @@ public class Post extends ParseObject {
         put(KEY_MEDIA, media);
     }
 
-    public List<String> getLikes() { return getList(KEY_LIKES); }
+    public List<ParseUser> getLikes() { return getList(KEY_LIKES); }
 
     public void setLikes(List<String> likes) { put(KEY_LIKES, likes); }
 

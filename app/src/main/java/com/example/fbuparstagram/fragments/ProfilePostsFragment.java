@@ -18,6 +18,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.fbuparstagram.EndlessRecyclerViewScrollListener;
+import com.example.fbuparstagram.Queryer;
 import com.example.fbuparstagram.R;
 import com.example.fbuparstagram.adapters.PostsAdapter;
 import com.example.fbuparstagram.databinding.FragmentFeedBinding;
@@ -88,25 +89,20 @@ public class ProfilePostsFragment extends FeedFragment {
 
     public void queryPosts() {
         showProgressBar();
-        ParseQuery<Post> query = ParseQuery.getQuery(Post.class);
-        query.include(Post.KEY_USER);
-        query.whereEqualTo(Post.KEY_USER, mUser);
-        query.setSkip(mSkipAmount * (mPage-1));
-        query.setLimit(mSkipAmount);
-        query.addDescendingOrder(Post.KEY_CREATED_AT);
-        query.findInBackground(new FindCallback<Post>() {
+        Queryer query = Queryer.getInstance();
+        query.queryPosts(new Queryer.QueryCallback() {
             @Override
-            public void done(List<Post> posts, ParseException e) {
-                if(e != null) {
-                    Log.e(TAG, "Failed to get all posts", e);
-                    return;
-                }
-                Log.i(TAG, ""+posts.size());
-                mAllPosts.addAll(posts);
+            public void done(List data) {
+                mAllPosts.addAll(data);
                 mAdapter.notifyDataSetChanged();
                 hideProgressBar();
             }
-        });
+
+            @Override
+            public void done(ParseUser user) {
+
+            }
+        }, mUser);
     }
 
     public void showProgressBar() {

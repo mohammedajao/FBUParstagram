@@ -19,6 +19,7 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 
 import com.example.fbuparstagram.EndlessRecyclerViewScrollListener;
+import com.example.fbuparstagram.Queryer;
 import com.example.fbuparstagram.activities.MainActivity;
 import com.example.fbuparstagram.adapters.PostsAdapter;
 import com.example.fbuparstagram.R;
@@ -27,6 +28,7 @@ import com.example.fbuparstagram.models.Post;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
+import com.parse.ParseUser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,7 +60,6 @@ public class FeedFragment extends Fragment {
     private MenuItem mMiActionProgress;
     protected ProgressBar mProgressBar;
 
-    private int mSkipAmount = 20;
     protected int mPage = 1;
 
     public FeedFragment() {
@@ -147,26 +148,21 @@ public class FeedFragment extends Fragment {
 
     public void queryPosts() {
         showProgressBar();
-        ParseQuery<Post> query = ParseQuery.getQuery(Post.class);
-        query.include(Post.KEY_USER);
-        query.setSkip(mSkipAmount * (mPage - 1));
-        query.setLimit(mSkipAmount);
-        query.addDescendingOrder(Post.KEY_CREATED_AT);
-        query.findInBackground(new FindCallback<Post>() {
+        Queryer query = Queryer.getInstance();
+        query.setPage(mPage);
+        query.queryPosts(new Queryer.QueryCallback() {
             @Override
-            public void done(List<Post> posts, ParseException e) {
-                if(e != null) {
-                    Log.e(TAG, "Failed to get all posts", e);
-                    return;
-                }
-                for(Post post : posts) {
-                    Log.i("POSTS:", post.getMedia().toString());
-                }
-                mAllPosts.addAll(posts);
+            public void done(List data) {
+                mAllPosts.addAll(data);
                 mAdapter.notifyDataSetChanged();
                 hideProgressBar();
             }
-        });
+
+            @Override
+            public void done(ParseUser user) {
+
+            }
+        }, null);
     }
 
     public void loadNextDataFromApi(int offset) {

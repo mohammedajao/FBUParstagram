@@ -1,7 +1,9 @@
 package com.example.fbuparstagram.adapters;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,14 +15,22 @@ import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.example.fbuparstagram.Queryer;
 import com.example.fbuparstagram.R;
 import com.example.fbuparstagram.fragments.ProfileFragment;
 import com.example.fbuparstagram.models.Post;
+import com.example.fbuparstagram.models.User;
+import com.parse.ParseException;
 import com.parse.ParseFile;
+import com.parse.ParseUser;
+import com.parse.SaveCallback;
 
 import java.util.List;
 
 public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> {
+    public static final String TAG = PostsAdapter.class.getSimpleName();
+    public static final int LIKE_COLOR = Color.argb(255, 100, 255, 100);
+
     private Context mContext;
     private List<Post> mPosts;
     private FragmentManager mFragmentManager;
@@ -77,6 +87,9 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         private ImageView mIVDirect;
         private ImageView mIVBookmark;
 
+        private boolean mLiked = false;
+        private int mUserPosition = -1;
+
         public ViewHolder(@NonNull View view) {
             super(view);
             mTVUsername = view.findViewById(R.id.tvUsername);
@@ -94,12 +107,21 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         }
 
         public void bind(final Post post) {
+            final List<ParseUser> likes = post.getLikes();
+            mIVLike.clearColorFilter();
+            mLiked = false;
+            for(int i=0;i<likes.size();i++) {
+                if (likes.get(i).getObjectId().equals(ParseUser.getCurrentUser().getObjectId())) {
+                    mIVLike.setImageResource(R.drawable.ufi_heart_active);
+                    mLiked = true;
+                    break;
+                }
+            }
             mTVCaption.setText(post.getBody());
             mTVUsername.setText(post.getUser().getUsername());
             mTVUSN.setText(post.getUser().getUsername());
             mTVDate.setText(Post.getRelativeTimeAgo(post.getCreatedAt()));
             List<ParseFile> mediaFiles = post.getMedia();
-            List<String> likes = post.getLikes();
             if(likes.size() == 0) {
                 mTVLikeCount.setVisibility(View.GONE);
             } else {
@@ -122,6 +144,61 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
                     bundle.putString("USER_TARGET", post.getUser().getUsername());
                     profileFrag.setArguments(bundle);
                     mFragmentManager.beginTransaction().replace(R.id.fragmentContainer, profileFrag).commit();
+                }
+            });
+
+            mIVLike.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    List<ParseUser> postLikes = post.getLikes();
+                    if(mUserPosition != -1)
+                        return;
+                    if(mLiked) {
+                        for(int i=0;i<postLikes.size();i++) {
+                            if(postLikes.get(i).getObjectId().equals(ParseUser.getCurrentUser().getObjectId())) {
+                                postLikes.remove(i);
+                            }
+                        }
+//                       ParseUser.getCurrentUser().put("likes", likedPosts);
+                       post.put("likes", postLikes);
+                       post.put("likes_count", postLikes.size());
+                       post.saveInBackground(new SaveCallback() {
+                           @Override
+                           public void done(ParseException e) {
+                               if(e != null) {
+                                   Log.e(TAG, "Failed to save post on like", e);
+                                   return;
+                               }
+                               mTVLikeCount.setText("Liked by " + (post.getLikesCount()) + " others");
+                           }
+                       });
+                        mLiked = false;
+                        mIVLike.setImageResource(R.drawable.ufi_heart_icon);
+                    } else {
+//                        Log.i(TAG, likedPosts.toString());
+//                        likedPosts.add(post);
+                        likes.add(ParseUser.getCurrentUser());
+//                        ParseUser.getCurrentUser().put("likes", likedPosts);
+                        post.put("likes", postLikes);
+                        post.put("likes_count", postLikes.size());
+                        post.saveInBackground(new SaveCallback() {
+                            @Override
+                            public void done(ParseException e) {
+                                if(e != null) {
+                                    Log.e(TAG, "Failed to save post on unlike", e);
+                                    return;
+                                }
+                                mTVLikeCount.setText("Liked by " + (post.getLikesCount()) + " others");
+                            }
+                        });
+                        mLiked = true;
+                        mIVLike.setImageResource(R.drawable.ufi_heart_active);
+                    }
+                    if(post.getLikesCount() > 0) {
+                        mTVLikeCount.setVisibility(View.VISIBLE);
+                    } else {
+                        mTVLikeCount.setVisibility(View.GONE);
+                    }
                 }
             });
         }
