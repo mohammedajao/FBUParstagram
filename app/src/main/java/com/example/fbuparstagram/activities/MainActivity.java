@@ -24,10 +24,13 @@ import com.example.fbuparstagram.databinding.ToolbarBinding;
 import com.example.fbuparstagram.fragments.ComposeFragment;
 import com.example.fbuparstagram.fragments.FeedFragment;
 import com.example.fbuparstagram.fragments.ProfileFragment;
+import com.example.fbuparstagram.models.Comment;
 import com.example.fbuparstagram.models.Post;
+import com.example.fbuparstagram.models.User;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.parse.FindCallback;
 import com.parse.ParseException;
+import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
@@ -48,8 +51,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        final FragmentManager fragmentManager = getSupportFragmentManager();
 
         // Start with fragment we want
 //        if (savedInstanceState == null){
@@ -73,28 +74,23 @@ public class MainActivity extends AppCompatActivity {
         mButtonNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-                Fragment fragment = null;
                 switch(menuItem.getItemId()) {
                     case R.id.miCompose:
-                        fragment = new FeedFragment();
                         launchCamera();
                         break;
                     case R.id.miProfile:
-                        fragment = new ProfileFragment();
                         Bundle bundle = new Bundle();
                         bundle.putString("USER_TARGET", ParseUser.getCurrentUser().getUsername());
-                        fragment.setArguments(bundle);
+                        loadFragment(new ProfileFragment(), bundle);
                         break;
                     default:
-                        fragment = new FeedFragment();
+                        loadFragment(new FeedFragment(), null);
                         break;
                 }
-                fragmentManager.beginTransaction().replace(R.id.fragmentContainer, fragment).commit();
                 return true;
             }
         });
-
-        fragmentManager.beginTransaction().replace(R.id.fragmentContainer, new FeedFragment()).commit();
+        loadFragment(new FeedFragment(), null);
     }
 
 
@@ -148,4 +144,8 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void loadFragment(Fragment fragment, Bundle bundle) {
+        fragment.setArguments(bundle);
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, fragment).commit();
+    }
 }

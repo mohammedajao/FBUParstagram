@@ -24,6 +24,7 @@ import com.example.fbuparstagram.activities.MainActivity;
 import com.example.fbuparstagram.adapters.PostsAdapter;
 import com.example.fbuparstagram.R;
 import com.example.fbuparstagram.databinding.FragmentFeedBinding;
+import com.example.fbuparstagram.models.Comment;
 import com.example.fbuparstagram.models.Post;
 import com.parse.FindCallback;
 import com.parse.ParseException;
@@ -160,6 +161,16 @@ public class FeedFragment extends Fragment {
 
             @Override
             public void done(ParseUser user) {
+
+            }
+
+            @Override
+            public void done(Post post) {
+
+            }
+
+            @Override
+            public void done(Comment cmt) {
 
             }
         }, null);

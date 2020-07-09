@@ -1,6 +1,7 @@
 package com.example.fbuparstagram.adapters;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
@@ -17,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.fbuparstagram.Queryer;
 import com.example.fbuparstagram.R;
+import com.example.fbuparstagram.activities.PostViewActivity;
 import com.example.fbuparstagram.fragments.ProfileFragment;
 import com.example.fbuparstagram.models.Post;
 import com.example.fbuparstagram.models.User;
@@ -29,7 +31,6 @@ import java.util.List;
 
 public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> {
     public static final String TAG = PostsAdapter.class.getSimpleName();
-    public static final int LIKE_COLOR = Color.argb(255, 100, 255, 100);
 
     private Context mContext;
     private List<Post> mPosts;
@@ -106,6 +107,12 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             mIVBookmark = view.findViewById(R.id.ivBookmark);
         }
 
+        private void displayPostView(String postId) {
+            Intent intent = new Intent(mContext, PostViewActivity.class);
+            intent.putExtra(PostViewActivity.KEY_POST_ID, postId);
+            mContext.startActivity(intent);
+        }
+
         public void bind(final Post post) {
             final List<ParseUser> likes = post.getLikes();
             mIVLike.clearColorFilter();
@@ -136,6 +143,19 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             if(file != null)
                 Glide.with(mContext).load(file.getUrl()).into(mIVAvatar);
 
+            mTVCommentBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    displayPostView(post.getObjectId());
+                }
+            });
+
+            mIVComment.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    displayPostView(post.getObjectId());
+                }
+            });
             mIVAvatar.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -175,10 +195,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
                         mLiked = false;
                         mIVLike.setImageResource(R.drawable.ufi_heart_icon);
                     } else {
-//                        Log.i(TAG, likedPosts.toString());
-//                        likedPosts.add(post);
                         likes.add(ParseUser.getCurrentUser());
-//                        ParseUser.getCurrentUser().put("likes", likedPosts);
                         post.put("likes", postLikes);
                         post.put("likes_count", postLikes.size());
                         post.saveInBackground(new SaveCallback() {

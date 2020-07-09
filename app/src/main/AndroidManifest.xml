@@ -14,7 +14,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".activities.ProfileEditActivity"></activity>
+        <activity android:name=".activities.PostViewActivity"></activity>
+        <activity android:name=".activities.ProfileEditActivity" />
 
         <provider
             android:name="androidx.core.content.FileProvider"

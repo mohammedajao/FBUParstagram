@@ -1,6 +1,7 @@
 package com.example.fbuparstagram.models;
 
 import com.parse.ParseClassName;
+import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
@@ -16,7 +17,7 @@ public class User extends ParseUser {
     public User(){}
 
     public  String getUsername(){
-        return getString("username");
+        return getString(KEY_USN);
     }
     public void setUsername(String username){
         put(KEY_USN,username);

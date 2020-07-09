@@ -5,18 +5,47 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cvAvatar2Holder"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="10dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginBottom="10dp"
+        app:cardCornerRadius="40dp">
+
+        <ImageView
+            android:id="@+id/ivAvatar2"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:srcCompat="@tools:sample/avatars" />
+    </androidx.cardview.widget.CardView>
+
+    <include
+        android:id="@+id/toolbarMain"
+        layout="@layout/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="0dp"
+        android:layout_marginTop="0dp" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvComments"
         android:layout_width="143dp"
         android:layout_height="180dp"
+        android:layout_above="@+id/clPostComment"
         android:layout_below="@+id/tvDate"
-        android:layout_alignParentStart="true"
+        android:layout_alignStart="@+id/tvDate"
         android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true"
         android:layout_marginStart="0dp"
         android:layout_marginTop="0dp"
         android:layout_marginEnd="0dp"
-        android:layout_marginBottom="0dp" />
+        android:layout_marginBottom="0dp"
+        android:paddingBottom="10dp" />
 
     <ProgressBar
         android:id="@+id/pbLoading"
@@ -88,11 +117,11 @@
         android:id="@+id/ivAvatarCard"
         android:layout_width="40dp"
         android:layout_height="40dp"
+        android:layout_below="@+id/toolbarMain"
         android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
         android:layout_gravity="center"
         android:layout_marginStart="10dp"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="0dp"
         android:layout_marginBottom="10dp"
         android:padding="10dp"
         app:cardCornerRadius="50dp">
@@ -108,8 +137,8 @@
         android:id="@+id/tvUsername"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/clIcon"
-        android:layout_alignParentTop="true"
+        android:layout_below="@+id/toolbarMain"
+        android:layout_alignBottom="@+id/ivAvatarCard"
         android:layout_marginStart="10dp"
         android:layout_marginLeft="10dp"
         android:layout_marginTop="0dp"
@@ -130,7 +159,7 @@
         android:layout_width="30dp"
         android:layout_height="30dp"
         android:layout_above="@+id/clIcon"
-        android:layout_alignParentTop="true"
+        android:layout_below="@+id/toolbarMain"
         android:layout_alignParentEnd="true"
         android:layout_marginTop="10dp"
         android:layout_marginEnd="10dp"
@@ -211,5 +240,44 @@
         android:layout_marginBottom="10dp"
         android:text="22 hours ago"
         android:textSize="12sp" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/clPostComment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="10dp"
+        android:layout_toEndOf="@+id/cvAvatar2Holder"
+        android:background="@drawable/rounded_corner"
+        android:padding="1dp"
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp">
+
+        <EditText
+            android:id="@+id/etPostBody"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_marginRight="10dp"
+            android:ems="10"
+            android:hint="Add a comment.."
+            android:inputType="textPersonName"
+            android:textSize="12sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/tvPostBtn"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tvPostBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Post"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </RelativeLayout>

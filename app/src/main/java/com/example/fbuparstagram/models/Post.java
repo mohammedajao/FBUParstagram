@@ -6,6 +6,8 @@ import com.parse.ParseClassName;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
+import com.parse.ParseQuery;
+import com.parse.ParseRelation;
 import com.parse.ParseUser;
 
 import java.text.SimpleDateFormat;
@@ -21,7 +23,6 @@ public class Post extends ParseObject {
     public static final String KEY_CREATED_AT = "createdAt";
     public static final String KEY_LIKES = "likes";
     public static final String KEY_LIKES_COUNT = "likes_count";
-    public static final String KEY_COMMENTS = "comments";
 
     public String getBody() {
         return getString(KEY_BODY);
@@ -54,9 +55,6 @@ public class Post extends ParseObject {
     public void setUser(ParseUser user) {
         put(KEY_USER, user);
     }
-
-    public List<String> getComments() { return getList(KEY_COMMENTS); }
-    public void setComments(List<String> comments) { put(KEY_COMMENTS, comments); }
 
     public static String getRelativeTimeAgo(Date createdAt) {
         String twitterFormat = "EEE MMM dd HH:mm:ss ZZZZZ yyyy";

@@ -96,19 +96,6 @@ public class ProfileEditActivity extends AppCompatActivity {
     }
 
     @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        mMiDone.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem menuItem) {
-                // Save user data
-                saveUserData();
-                return false;
-            }
-        });
-        return super.onPrepareOptionsMenu(menu);
-    }
-
-    @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch(item.getItemId()) {
             case R.id.miEditProfileDone:

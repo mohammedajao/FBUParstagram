@@ -21,9 +21,11 @@ import android.widget.Toast;
 
 import com.example.fbuparstagram.R;
 import com.example.fbuparstagram.databinding.FragmentComposeBinding;
+import com.example.fbuparstagram.models.Comment;
 import com.example.fbuparstagram.models.Post;
 import com.parse.ParseException;
 import com.parse.ParseFile;
+import com.parse.ParseRelation;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
@@ -144,7 +146,6 @@ public class ComposeFragment extends Fragment {
         post.setUser(currentUser);
         post.setLikesCount(0);
         post.setLikes(new ArrayList<String>());
-        post.setComments(new ArrayList<String>());
 
         post.saveInBackground(new SaveCallback() {
             @Override

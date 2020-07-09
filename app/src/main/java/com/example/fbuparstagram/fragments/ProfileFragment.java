@@ -27,6 +27,7 @@ import com.example.fbuparstagram.activities.LoginActivity;
 import com.example.fbuparstagram.activities.ProfileEditActivity;
 import com.example.fbuparstagram.adapters.ProfileGridViewAdapter;
 import com.example.fbuparstagram.databinding.FragmentProfileBinding;
+import com.example.fbuparstagram.models.Comment;
 import com.example.fbuparstagram.models.Post;
 import com.parse.FindCallback;
 import com.parse.ParseException;
@@ -218,6 +219,16 @@ public class ProfileFragment extends Fragment {
 
             @Override
             public void done(ParseUser user) {
+
+            }
+
+            @Override
+            public void done(Post post) {
+
+            }
+
+            @Override
+            public void done(Comment cmt) {
 
             }
         }, mUser);

@@ -2,7 +2,9 @@ package com.example.fbuparstagram;
 
 import android.util.Log;
 
+import com.example.fbuparstagram.models.Comment;
 import com.example.fbuparstagram.models.Post;
+import com.example.fbuparstagram.models.User;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
@@ -19,8 +21,10 @@ public class Queryer {
     private boolean mDescendingOrder = true;
 
     public interface QueryCallback {
-        public void done(List data);
-        public void done(ParseUser user);
+        void done(List data);
+        void done(ParseUser user);
+        void done(Post post);
+        void done(Comment cmt);
     }
 
     private int mSkipAmount = 10;
@@ -58,6 +62,40 @@ public class Queryer {
                     return;
                 }
                 callback.done(posts);
+            }
+        });
+    }
+
+    public void queryPostsById(final QueryCallback callback, String objectId) {
+        ParseQuery<Post> query = ParseQuery.getQuery(Post.class);
+        query.include(Post.KEY_USER);
+        query.whereEqualTo(Post.KEY_OBJECT_ID, objectId);
+        try {
+            Post post = query.getFirst();
+            callback.done(post);
+        } catch (ParseException e) {
+            Log.e(TAG, "Failed to get post by objectId: " + objectId, e);
+            e.printStackTrace();
+        }
+    }
+
+    public void queryCommentsByPostId(final QueryCallback callback, String postId) {
+        ParseQuery<Comment> query = ParseQuery.getQuery(Comment.class);
+        query.include(Comment.KEY_POST);
+        query.include(Comment.KEY_AUTHOR + "." + User.KEY_USN);
+        query.include(Comment.KEY_AUTHOR + "." + User.KEY_AVATAR);
+        query.setSkip(mSkipAmount * (mPage - 1));
+        query.setLimit(LOAD_AMOUNT);
+        if(mDescendingOrder)
+            query.addDescendingOrder(Post.KEY_CREATED_AT);
+        query.findInBackground(new FindCallback<Comment>() {
+            @Override
+            public void done(List<Comment> comments, ParseException e) {
+                if(e != null) {
+                    Log.e(TAG, "Failed to get all posts", e);
+                    return;
+                }
+                callback.done(comments);
             }
         });
     }
