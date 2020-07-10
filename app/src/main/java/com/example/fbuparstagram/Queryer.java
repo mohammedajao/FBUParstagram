@@ -27,7 +27,7 @@ public class Queryer {
         void done(Comment cmt);
     }
 
-    private int mSkipAmount = 10;
+    private int mSkipAmount = 20;
     private static Queryer singleton;
 
     public static Queryer getInstance() {
@@ -84,7 +84,7 @@ public class Queryer {
         query.include(Comment.KEY_POST);
         query.include(Comment.KEY_AUTHOR + "." + User.KEY_USN);
         query.include(Comment.KEY_AUTHOR + "." + User.KEY_AVATAR);
-        query.setSkip(mSkipAmount * (mPage - 1));
+        query.setSkip(LOAD_AMOUNT * (mPage - 1));
         query.setLimit(LOAD_AMOUNT);
         if(mDescendingOrder)
             query.addDescendingOrder(Post.KEY_CREATED_AT);

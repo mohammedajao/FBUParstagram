@@ -7,12 +7,14 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -131,7 +133,8 @@ public class PostViewActivity extends AppCompatActivity {
         }
         mCmtsAdapter = new CommentsAdapter(this,mPostComments);
 
-        loadNextDataFromApi(0);
+        mPostComments.clear();
+        loadNextDataFromApi(1);
 
         mRvComments = mBinding.rvComments;
         mProgressBar = mBinding.pbLoading;
@@ -159,12 +162,12 @@ public class PostViewActivity extends AppCompatActivity {
             public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
                 // Triggered only when new data needs to be appended to the list
                 // Add whatever code is needed to append new items to the bottom of the list
-                loadNextDataFromApi(page);
+                loadNextDataFromApi(page+1);
             }
         };
         // Adds the scroll listener to RecyclerView
         mRvComments.addOnScrollListener(mEndlessScrollListener);
-
+        mRvComments.setItemViewCacheSize(Queryer.LOAD_AMOUNT);
         showProgressBar();
 
         bindContent();
@@ -202,21 +205,9 @@ public class PostViewActivity extends AppCompatActivity {
         if(currentUserAvatar != null)
             Glide.with(this).load(currentUserAvatar.getUrl()).into(mIVAvatar2);
 
-        mIVAvatar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                ProfileFragment profileFrag = new ProfileFragment();
-                Bundle bundle = new Bundle();
-                bundle.putString("USER_TARGET", mPost.getUser().getUsername());
-                profileFrag.setArguments(bundle);
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, profileFrag).commit();
-            }
-        });
-
         mPostBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.i(TAG, "Attempting to post comment");
                 if(!mPostBody.getText().toString().isEmpty()) {
                     final Comment userComment = new Comment();
                     userComment.setBody(mPostBody.getText().toString());
@@ -230,9 +221,13 @@ public class PostViewActivity extends AppCompatActivity {
                                 e.printStackTrace();
                                 return;
                             }
-                            mPostComments.add(userComment);
-                            mCmtsAdapter.notifyDataSetChanged();
+                            mPostComments.add(0, userComment);
+                            mCmtsAdapter.notifyItemInserted(0);
+                            mRvComments.smoothScrollToPosition(0);
                             mPostBody.clearFocus();
+                            mPostBody.setText("");
+                            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                            imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
                         }
                     });
                 }
@@ -293,16 +288,24 @@ public class PostViewActivity extends AppCompatActivity {
                 }
             }
         });
+
+        for(int i=0;i<likes.size();i++) {
+            if (likes.get(i).getObjectId().equals(ParseUser.getCurrentUser().getObjectId())) {
+                mIVLike.setImageResource(R.drawable.ufi_heart_active);
+            }
+        }
         hideProgressBar();
     }
 
     private void loadNextDataFromApi(int page) {
+        showProgressBar();
         mQueryer.setPage(page);
         mQueryer.queryCommentsByPostId(new Queryer.QueryCallback() {
             @Override
             public void done(List data) {
-                mPostComments.addAll(data);
-                mCmtsAdapter.notifyDataSetChanged();
+                if(data.size() > 0)
+                    mCmtsAdapter.addAll(data);
+                hideProgressBar();
             }
 
             @Override
@@ -324,10 +327,12 @@ public class PostViewActivity extends AppCompatActivity {
     }
 
     private void showProgressBar() {
-        mProgressBar.setVisibility(View.VISIBLE);
+        if(mProgressBar != null)
+            mProgressBar.setVisibility(View.VISIBLE);
     }
 
     private void hideProgressBar() {
-        mProgressBar.setVisibility(View.GONE);
+        if(mProgressBar != null)
+            mProgressBar.setVisibility(View.GONE);
     }
 }

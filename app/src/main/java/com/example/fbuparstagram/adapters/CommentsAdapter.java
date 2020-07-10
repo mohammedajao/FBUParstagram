@@ -52,13 +52,26 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Comment comment = mComments.get(position);
+        Log.i(TAG, "Comment Id:" +position + " " + comment.getObjectId() + "|" + mComments.size());
         holder.bind(comment);
+    }
+
+    public void clear() {
+        mComments.clear();
+        notifyDataSetChanged();
+    }
+
+    public void addAll(List<Comment> list) {
+        mComments.addAll(list);
+        notifyDataSetChanged();
     }
 
     @Override
     public int getItemCount() {
         return mComments.size();
     }
+
+
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         public ViewHolder(@NonNull View itemView) {
@@ -71,11 +84,16 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
 
         public void bind(Comment comment) {
             ParseUser cmtUser = comment.getAuthor();
+            String username = cmtUser.getUsername();
+            String body = comment.getBody();
+            mTVUsername.setText(username);
+            mTVBody.setText(body);
+//            Log.i(TAG, cmtUser.getUsername() + " Body: " + body);
             ParseFile file = cmtUser.getParseFile(User.KEY_AVATAR);
-            if (file != null)
+            if (file != null) {
+                mIVAvatar.setImageDrawable(null);
                 Glide.with(mContext).load(file.getUrl()).into(mIVAvatar);
-            mTVUsername.setText(cmtUser.getUsername());
-            mTVBody.setText(comment.getBody());
+            }
             mTVDate.setText(Util.getRelativeTimeAgo(comment.getCreatedAt()));
         }
     }
