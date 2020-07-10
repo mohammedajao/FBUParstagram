@@ -33,6 +33,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 
+// Edit profile data and upload it to our database
 public class ProfileEditActivity extends AppCompatActivity {
     public static final String TAG = ProfileEditActivity.class.getSimpleName();
     public static final int GET_FROM_GALLERY = 3;
@@ -85,6 +86,7 @@ public class ProfileEditActivity extends AppCompatActivity {
         });
     }
 
+    // Set up done action to upload data in our editActivity like Instagram
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
@@ -95,6 +97,7 @@ public class ProfileEditActivity extends AppCompatActivity {
         return super.onCreateOptionsMenu(menu);
     }
 
+    // Bind action to done's click event listener
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch(item.getItemId()) {
@@ -105,7 +108,7 @@ public class ProfileEditActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-
+    // Get image data on upload and set the avatar bitmap
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -122,6 +125,7 @@ public class ProfileEditActivity extends AppCompatActivity {
         }
     }
 
+    // Upload the user data to parse by getting strings and bitmaps from views
     private void saveUserData() {
         currentUser.put("bio", etBio.getText().toString());
         currentUser.put("username", etUsername.getText().toString());
@@ -129,7 +133,6 @@ public class ProfileEditActivity extends AppCompatActivity {
         if(drawable != null) {
             Bitmap bitmap = drawable.getBitmap();
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
-            // Compress image to lower quality scale 1 - 100
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
             byte[] image = stream.toByteArray();
             ParseFile file = new ParseFile(currentUser.getObjectId() + "_avatar.png", image);

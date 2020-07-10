@@ -13,6 +13,7 @@ import com.parse.ParseUser;
 import java.util.Arrays;
 import java.util.List;
 
+// Top-level singleton to query for various datasets inside our Parse Database
 public class Queryer {
     public static final String TAG = Queryer.class.getSimpleName();
     public static final int LOAD_AMOUNT = 20;

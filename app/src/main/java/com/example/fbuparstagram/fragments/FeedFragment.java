@@ -174,6 +174,7 @@ public class FeedFragment extends Fragment {
 
             }
         }, null);
+        query.setPage(1);
     }
 
     public void loadNextDataFromApi(int offset) {

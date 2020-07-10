@@ -52,11 +52,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Start with fragment we want
-//        if (savedInstanceState == null){
-//            getSupportFragmentManager().beginTransaction()
-//                    .add(android.R.id.content, new Fragment_name_which_you_wantto_open()).commit();}
-
         ActivityFeedBinding binding = ActivityFeedBinding.inflate(getLayoutInflater());
         View view = binding.getRoot();
         setContentView(view);
@@ -93,7 +88,6 @@ public class MainActivity extends AppCompatActivity {
         loadFragment(new FeedFragment(), null);
     }
 
-
     private void launchCamera() {
         Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         mPhotoFile = getPhotoFileUri();
@@ -116,6 +110,7 @@ public class MainActivity extends AppCompatActivity {
         return file;
     }
 
+    // Get path as a String for intents/other fragments to use
     private String getPhotoFilePath() {
         File mediaStorageDir = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES), TAG);
 
@@ -125,6 +120,7 @@ public class MainActivity extends AppCompatActivity {
         return mediaStorageDir.getPath() + File.separator + mPhotoFileName;
     }
 
+    // Get the camera's data
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -144,6 +140,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    // Go to an app section via fragments
     private void loadFragment(Fragment fragment, Bundle bundle) {
         fragment.setArguments(bundle);
         getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, fragment).commit();

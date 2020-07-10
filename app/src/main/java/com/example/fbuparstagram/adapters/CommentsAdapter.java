@@ -88,7 +88,6 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
             String body = comment.getBody();
             mTVUsername.setText(username);
             mTVBody.setText(body);
-//            Log.i(TAG, cmtUser.getUsername() + " Body: " + body);
             ParseFile file = cmtUser.getParseFile(User.KEY_AVATAR);
             if (file != null) {
                 mIVAvatar.setImageDrawable(null);

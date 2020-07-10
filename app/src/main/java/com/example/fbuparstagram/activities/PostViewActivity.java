@@ -81,6 +81,14 @@ public class PostViewActivity extends AppCompatActivity {
 
     Queryer mQueryer;
 
+    /*
+    Get the full post data by query and get its comments.
+    TODO: Change the above to get the post from the other activity by including the required data in the initial query
+
+    Set up adapter and get the post's comments
+    Get references to our UI elements
+    Bind the events/data to them
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -189,6 +197,7 @@ public class PostViewActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    // Binds data and events to our view
     private void bindContent() {
         mTVUsername.setText(mPost.getUser().getUsername());
         mTVCaption.setText(mPost.getBody());
@@ -297,6 +306,7 @@ public class PostViewActivity extends AppCompatActivity {
         hideProgressBar();
     }
 
+    // Get the next page of content
     private void loadNextDataFromApi(int page) {
         showProgressBar();
         mQueryer.setPage(page);

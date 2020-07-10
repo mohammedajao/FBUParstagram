@@ -43,6 +43,8 @@ import java.util.List;
  * Use the {@link ProfileFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
+
+// Currently does not allow users to see all their posts
 public class ProfileFragment extends Fragment {
     public static final String TAG = ProfileFragment.class.getSimpleName();
 

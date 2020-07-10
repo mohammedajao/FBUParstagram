@@ -128,6 +128,7 @@ public class ComposeFragment extends Fragment {
         });
     }
 
+    // Set image preview for the picture taken
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -137,6 +138,7 @@ public class ComposeFragment extends Fragment {
         }
     }
 
+    // Save post metadata to Parse DB
     private void savePost(String description, ParseUser currentUser, File mPhotoFile) {
         List<ParseFile> media = new ArrayList<>();
         media.add(new ParseFile(mPhotoFile));
