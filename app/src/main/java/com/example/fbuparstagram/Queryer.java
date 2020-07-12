@@ -80,9 +80,10 @@ public class Queryer {
         }
     }
 
-    public void queryCommentsByPostId(final QueryCallback callback, String postId) {
+    public void queryCommentsByPostId(final QueryCallback callback, Post post) {
         ParseQuery<Comment> query = ParseQuery.getQuery(Comment.class);
         query.include(Comment.KEY_POST);
+        query.whereEqualTo(Comment.KEY_POST, post);
         query.include(Comment.KEY_AUTHOR + "." + User.KEY_USN);
         query.include(Comment.KEY_AUTHOR + "." + User.KEY_AVATAR);
         query.setSkip(LOAD_AMOUNT * (mPage - 1));

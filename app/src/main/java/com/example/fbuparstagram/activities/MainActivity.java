@@ -69,12 +69,13 @@ public class MainActivity extends AppCompatActivity {
         mButtonNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+                Bundle bundle;
                 switch(menuItem.getItemId()) {
                     case R.id.miCompose:
                         launchCamera();
                         break;
                     case R.id.miProfile:
-                        Bundle bundle = new Bundle();
+                        bundle = new Bundle();
                         bundle.putString("USER_TARGET", ParseUser.getCurrentUser().getUsername());
                         loadFragment(new ProfileFragment(), bundle);
                         break;

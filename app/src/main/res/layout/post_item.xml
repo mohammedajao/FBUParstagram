@@ -169,18 +169,18 @@
 
     <TextView
         android:id="@+id/tvCaption"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignTop="@+id/tvUSN"
-        android:layout_alignBottom="@+id/tvUSN"
         android:layout_alignParentEnd="true"
         android:layout_marginStart="5dp"
         android:layout_marginTop="0dp"
         android:layout_marginEnd="0dp"
-        android:layout_marginBottom="0dp"
         android:layout_toEndOf="@+id/tvUSN"
         android:layout_weight="1"
-        android:gravity="center_vertical"
+        android:gravity="start|left"
+        android:inputType="textMultiLine"
+        android:singleLine="false"
         android:text="content description"
         android:textSize="12sp" />
 

@@ -110,9 +110,10 @@ public class FeedFragment extends Fragment {
             public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
                 // Triggered only when new data needs to be appended to the list
                 // Add whatever code is needed to append new items to the bottom of the list
-                loadNextDataFromApi(page);
+                loadNextDataFromApi(page+1);
             }
         };
+        rvPosts.addOnScrollListener(mEndlessScrollListener);
         mSwipeContainer = mBinding.swipeContainer;
         mSwipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -178,8 +179,8 @@ public class FeedFragment extends Fragment {
     }
 
     public void loadNextDataFromApi(int offset) {
+
         mPage = offset;
-        Log.i(TAG, ""+offset);
         queryPosts();
         // Send an API request to retrieve appropriate paginated data
         //  --> Send the request including an offset value (i.e `page`) as a query parameter.

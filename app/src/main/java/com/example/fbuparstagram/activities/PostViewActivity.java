@@ -332,7 +332,7 @@ public class PostViewActivity extends AppCompatActivity {
             public void done(Comment cmt) {
 
             }
-        }, mPost.getObjectId());
+        }, mPost);
         mQueryer.setPage(0);
     }
 

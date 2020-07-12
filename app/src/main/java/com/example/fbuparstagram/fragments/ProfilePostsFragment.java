@@ -42,10 +42,7 @@ public class ProfilePostsFragment extends FeedFragment {
     public static final String TAG = ProfilePostsFragment.class.getSimpleName();
     public static final String ARG_ITEM_POSITION ="ITEM_POSITION";
 
-    private int mSkipAmount = 20;
     private int mItemPosition = 0;
-    private FragmentProfilePostsBinding mBinding;
-
     private MenuItem mMiActionProgress;
     private ParseUser mUser;
 
@@ -91,6 +88,7 @@ public class ProfilePostsFragment extends FeedFragment {
     public void queryPosts() {
         showProgressBar();
         Queryer query = Queryer.getInstance();
+        query.setPage(mPage);
         query.queryPosts(new Queryer.QueryCallback() {
             @Override
             public void done(List data) {

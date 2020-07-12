@@ -1,5 +1,6 @@
 package com.example.fbuparstagram.fragments;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -7,6 +8,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
@@ -15,11 +17,14 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.fbuparstagram.R;
+import com.example.fbuparstagram.activities.PostViewActivity;
 import com.example.fbuparstagram.databinding.FragmentComposeBinding;
 import com.example.fbuparstagram.models.Comment;
 import com.example.fbuparstagram.models.Post;
@@ -47,6 +52,8 @@ public class ComposeFragment extends Fragment {
 
     private TextView mETCaption;
     private ImageView mIVPreview;
+
+    private ProgressBar mProgressBar;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -103,6 +110,7 @@ public class ComposeFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         Bitmap takenImage = BitmapFactory.decodeFile(mPhotoFile.getAbsolutePath());
         mETCaption = view.findViewById(R.id.etCaption);
+        mProgressBar = binding.progressBarHorizontal;
         mIVPreview = view.findViewById(R.id.ivPreview);
         binding.ivPreview.setImageBitmap(takenImage);
         binding.btnShare.setOnClickListener(new View.OnClickListener(){
@@ -112,6 +120,8 @@ public class ComposeFragment extends Fragment {
                 String description = binding.etCaption.getText().toString();
                 Log.i(TAG, "Checking to see if post can be saved.");
                 mETCaption.clearFocus();
+                InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
                 if(description.isEmpty()) {
                     Toast.makeText(getContext(), "Description cannot be empty!", Toast.LENGTH_SHORT);
                     return;
@@ -123,7 +133,7 @@ public class ComposeFragment extends Fragment {
                 Log.i(TAG, "Saving post!");
                 ParseUser currentUser = ParseUser.getCurrentUser();
                 savePost(description, currentUser, mPhotoFile);
-                getActivity().getSupportFragmentManager().beginTransaction().remove(ComposeFragment.this).commit();
+                Toast.makeText(getContext(), "Your post was uploaded. Refresh to see!", Toast.LENGTH_SHORT);
             }
         });
     }
@@ -140,6 +150,8 @@ public class ComposeFragment extends Fragment {
 
     // Save post metadata to Parse DB
     private void savePost(String description, ParseUser currentUser, File mPhotoFile) {
+        showProgress();
+        setProgressAmount(0);
         List<ParseFile> media = new ArrayList<>();
         media.add(new ParseFile(mPhotoFile));
         Post post = new Post();
@@ -148,16 +160,18 @@ public class ComposeFragment extends Fragment {
         post.setUser(currentUser);
         post.setLikesCount(0);
         post.setLikes(new ArrayList<String>());
+        setProgressAmount(50);
 
         post.saveInBackground(new SaveCallback() {
             @Override
             public void done(ParseException e) {
                 if(e != null) {
                     Log.e(TAG, "Error while saving post", e);
-                    Toast.makeText(getContext(), "Your post failed to go through!", Toast.LENGTH_SHORT);
                 }
                 mETCaption.setText("");
                 mIVPreview.setImageResource(0);
+                setProgressAmount(100);
+                hideProgress();
             }
         });
 
@@ -182,5 +196,17 @@ public class ComposeFragment extends Fragment {
 
         File file = new File(mPhotoFilePath);
         return file;
+    }
+
+    private void showProgress() {
+        mProgressBar.setVisibility(View.VISIBLE);
+    }
+
+    private void setProgressAmount(int amount) {
+        mProgressBar.setProgress(amount);
+    }
+
+    private void hideProgress() {
+        mProgressBar.setVisibility(View.GONE);
     }
 }
